@@ -1,0 +1,12 @@
+#!/bin/bash
+cd /home/steve/Videos/Plex
+find /home/steve/Media/Laundry-Basket/ -mindepth 1 -maxdepth 1 -type d -name '*iso' | while read iso; do
+	iso_basename="$(basename $iso)"
+	pgrep -f $iso_basename && continue
+	test "$is_encoding" -eq 1 && continue
+	echo $iso_basename not encoding
+	num_missing_episodes="$(/home/steve/bin/dvd_query -n -e -x $iso)"
+	echo $iso_basename $num_missing_episodes episodes remaining
+	test $num_missing_episodes -ne 0 && continue
+	mv -v $iso /home/steve/Media/Storage-Closet/
+done

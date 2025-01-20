@@ -1,0 +1,92 @@
+#!/bin/bash
+
+header="#!/bin/bash
+control_c() {
+        exit 1
+}
+trap control_c INT"
+
+function is_dvd {
+
+	device="$(realpath $1)"
+	test -z "$device" && return 1
+	test -e "$device" || return 1
+	test "$device" == "/dev/dvd" && return 0
+	test "$device" == "/dev/sr0" && return 0
+	test "${device: -3}" == "iso" && return 0
+	test "${device: -8}" == "VIDEO_TS" && return 0
+
+	return 1
+
+}
+
+for iso in $*; do
+
+	is_dvd "$iso" || continue
+
+	filename="`basename \"$iso\" .iso`.sh"
+	test -e "$filename" && rm "$filename"
+	content=$(dart --encode-info --qa "$iso" | grep HandBrakeCLI)
+	content="$content --stop-at duration:60 --start-at duration:120"
+	test -z "$content" && continue
+	echo "$header" > "$filename"
+	echo "$content" >> "$filename"
+	
+	# nofilters
+	nofilters_filename="nofilters.${filename}"
+	cp "$filename" "nofilters.${filename}"
+	sed -i -e "s/'--detelecine' //g" "$nofilters_filename"
+	sed -i -e "s/'--decomb' //g" "$nofilters_filename"
+	sed -i -e "s/'--deinterlace' //g" "$nofilters_filename"
+	sed -i -e "s/mp4/nofilters\.mp4/g" "$nofilters_filename"
+	chmod +x "$nofilters_filename"
+
+	# detelecine
+	detelecine_filename="detelecine.${filename}"
+	detelecine_content="${content}"
+	echo "$detelecine_content" > "$detelecine_filename"
+	sed -i -e "s/'--detelecine' //g" "$detelecine_filename"
+	sed -i -e "s/'--decomb' //g" "$detelecine_filename"
+	sed -i -e "s/'--deinterlace' //g" "$detelecine_filename"
+	sed -i -e "s/mp4/detelecine\.mp4/g" "$detelecine_filename"
+	sed -i -e "s/mp4'/mp4' '--detelecine'/g" "$detelecine_filename"
+	chmod +x "$detelecine_filename"
+
+	# decomb
+	decomb_filename="decomb.${filename}"
+	decomb_content="${content}"
+	echo "$decomb_content" > "$decomb_filename"
+	sed -i -e "s/'--detelecine' //g" "$decomb_filename"
+	sed -i -e "s/'--decomb' //g" "$decomb_filename"
+	sed -i -e "s/'--deinterlace' //g" "$decomb_filename"
+	sed -i -e "s/mp4/decomb\.mp4/g" "$decomb_filename"
+	sed -i -e "s/mp4'/mp4' '--decomb'/g" "$decomb_filename"
+	chmod +x "$decomb_filename"
+
+	# detelecine + decomb
+	filters_filename="filters.${filename}"
+	filters_content="${content}"
+	echo "$filters_content" > "$filters_filename"
+	sed -i -e "s/'--detelecine' //g" "$filters_filename"
+	sed -i -e "s/'--decomb' //g" "$filters_filename"
+	sed -i -e "s/'--deinterlace' //g" "$filters_filename"
+	sed -i -e "s/mp4/filters\.mp4/g" "$filters_filename"
+	sed -i -e "s/mp4'/mp4' '--detelecine'/g" "$filters_filename"
+	sed -i -e "s/mp4'/mp4' '--decomb'/g" "$filters_filename"
+	chmod +x "$filters_filename"
+
+	# deinterlace
+	deinterlace_filename="deinterlace.${filename}"
+	deinterlace_content="${content}"
+	echo "$deinterlace_content" > "$deinterlace_filename"
+	sed -i -e "s/'--detelecine' //g" "$deinterlace_filename"
+	sed -i -e "s/'--decomb' //g" "$deinterlace_filename"
+	sed -i -e "s/'--deinterlace' //g" "$deinterlace_filename"
+	sed -i -e "s/mp4/deinterlace\.mp4/g" "$deinterlace_filename"
+	sed -i -e "s/mp4'/mp4' '--detelecine'/g" "$deinterlace_filename"
+	sed -i -e "s/mp4'/mp4' '--decomb'/g" "$deinterlace_filename"
+	chmod +x "$deinterlace_filename"
+
+	rm "$filename"
+
+done

@@ -1,0 +1,3 @@
+#/bin/bash
+find /home/steve/Videos/Plex -xtype l -delete
+find /home/steve/Videos/Rip-o-Matic/bulky-bottles -xtype l -delete

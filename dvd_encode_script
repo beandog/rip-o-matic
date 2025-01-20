@@ -1,0 +1,36 @@
+#!/bin/bash
+
+header="#!/bin/bash
+control_c() {
+        exit 1
+}
+trap control_c INT"
+
+function is_dvd {
+
+	device="$(realpath $1)"
+	test -z "$device" && return 1
+	test -e "$device" || return 1
+	test "$device" == "/dev/dvd" && return 0
+	test "$device" == "/dev/sr0" && return 0
+	test "${device: -3}" == "iso" && return 0
+	test "${device: -8}" == "VIDEO_TS" && return 0
+
+	return 1
+
+}
+
+for iso in $*; do
+
+	is_dvd "$iso" || continue
+
+	filename="`basename \"$iso\" .iso`.sh"
+	test -e "$filename" && rm "$filename"
+	content=$(dart --encode-info --skip-existing "$iso" | egrep "(^HandBrakeCLI|dvd_info)")
+	test -z "$content" && continue
+	echo "$header" > "$filename"
+	echo "$content" >> "$filename"
+	realpath=$(realpath "$filename")
+	chmod +x "$filename"
+
+done
