@@ -1,0 +1,75 @@
+#!/bin/bash
+if [[ -z "$1" ]]; then echo "Need a filename"; exit 1; fi
+for video in $*; do
+
+	# Verify file exists
+	if [[ ! -e "${video}" ]]; then continue; fi
+
+	# Skip if a directory
+	if [[ -d "$video" ]]; then continue; fi
+
+	# Get the filename variables
+	video_basename="$(basename $video)"
+	video_realpath="$(realpath $video)"
+	video_realdir="$(dirname $video_realpath)"
+	video_episode="/opt/jfin/episodes/${video_basename}"
+	if [[ "$video_realdir" != "/root/Library" ]]; then
+		video_episode=$video_realpath
+	fi
+	video_library_prefix="${video_basename:0:1}"
+	video_library_suffix="${video_basename:2:1}"
+	video_library_type="${video_basename:17:2}"
+
+	# Sort into its library
+	if [[ "$video_library_prefix" == "1" ]]; then
+		video_library="cartoons"
+	elif [[ "$video_library_prefix" == "2" ]]; then
+		video_library="tv"
+	elif [[ "$video_library_prefix" == "3" ]]; then
+		video_library="jared"
+	elif [[ "$video_library_prefix" == "4" ]]; then
+		video_library="movies"
+	elif [[ "$video_library_prefix" == "5" ]]; then
+		video_library="imax"
+	elif [[ "$video_library_prefix" == "6" ]]; then
+		video_library="hdtv"
+	elif [[ "$video_library_prefix" == "7" ]]; then
+		video_library="documentary"
+	elif [[ "$video_library_prefix" == "8" ]]; then
+		if [[ "$video_library_type" == "4K" ]]; then
+			video_library="ultrahd"
+		else
+			video_library="bluray"
+		fi
+	elif [[ "$video_library_prefix" == "9" ]]; then
+		video_library="holiday"
+	else
+		echo "jfin_link: library not found $video_basename"
+		continue
+	fi
+
+	# Use episode_query to find what Plex directory it should be sorted into
+	jfin_video_dirname=`/root/bin/episode_query --jfin --dirname "$video_episode"`
+
+	# Quit if dirname is empty, indicates that file is not in database
+	if [[ "$jfin_video_dirname" == "/" ]]; then echo jfin_link: episode not in database - $video_basename; continue; fi
+
+	jfin_video_dirname="/opt/jfin/libraries/${video_library}/$jfin_video_dirname"
+
+	# Quit if episode_query died for some reason
+	if [[ $? -ne 0 ]]; then echo jfin_link: episode_query --jfin --dirname $video_basename failed; continue; fi
+
+	# Same sequence for filename
+	jfin_video_filename=`/root/bin/episode_query --jfin "$video_episode"`
+	if [[ $? -ne 0 ]]; then echo jfin_link: episode_query $video_basename failed; continue; fi
+
+	if [[ ! -d "$jfin_video_dirname" ]]; then doas -u jellyfin -- mkdir -p "$jfin_video_dirname"; fi
+
+	if [[ ! -e "${jfin_video_dirname}${jfin_video_filename}" ]]; then
+		# echo doas -u jellyfin ln -v -s \"$video_episode\" \"${jfin_video_dirname}${jfin_video_filename}\"
+		doas -u jellyfin -- ln -v -s "$video_episode" "${jfin_video_dirname}${jfin_video_filename}"
+	fi
+
+	# su - jellyfin ln -v -s -f "$video_episode" "${jfin_video_dirname}${jfin_video_filename}"
+
+done
