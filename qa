@@ -1,8 +1,0 @@
-#!/bin/bash
-for x in $*; do
-	bn=$(basename "$x");
-	~/git/bluray_info/bluray_info -x "$x" > ~/git/qa/${bn}.all.txt
-	~/git/bluray_info/bluray_info -j "$x" > ~/git/qa/${bn}.json.txt
-done
-cd ~/git/bluray_info
-git rev-parse --short HEAD > ~/git/qa/0.000.0000.BDGIT.git.txt
