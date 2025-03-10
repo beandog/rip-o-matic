@@ -1,0 +1,72 @@
+#!/bin/bash
+
+control_c() {
+        exit 1
+}
+trap control_c INT
+
+# Ideally auto-update everything on plex, from copying here to updating there
+
+# Only run one instance of jfin_sync
+num_processes=$(pgrep -a -c -f '/bin/bash /home/steve/bin/jfin_sync')
+if [[ "$num_processes" -gt 1 ]]; then echo 'jfin_sync already running'; exit 1; fi
+
+# Settings for find
+find_options="-mmin -240"
+
+# Override
+if [[ "$1" == "all" ]]; then find_options=; fi
+
+# Use DLNA Library as master target -- if it is there, do not update it
+rsync_options="--no-motd -u --progress --no-compress"
+
+function video_encoding {
+
+	video=$1
+	video=$(basename $video)
+	num_processes=$(pgrep -c -f "(^ffmpeg.*|${video})")
+	if [[ "$num_processes" -gt 0 ]]; then return 0; else return 1; fi
+
+}
+
+function video_rsync {
+	video=$1
+	num_processes=$(pgrep -c -f "progress /home/steve/Videos/Tails/$video")
+	if [[ "$num_processes" -gt 0 ]]; then return 1; fi
+	episode=$(basename $1)
+	collection_id=${episode:0:1}
+	sync_dir="/opt/plex/sd"
+	if [[ "$collection_id" == "2" ]]; then
+		sync_dir="/opt/plex/tv"
+	fi
+	# rsync $rsync_options /home/steve/Videos/Tails/$video dlna.beandog.org:$sync_dir
+	rsync $rsync_options /home/steve/Videos/Tails/$video dlna.beandog.org:/opt/jfin/libraries/tails
+	return $?
+}
+
+echo "[TAILS] - Episode Sync"
+echo
+
+num_episodes=$(find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '1*.m??' | wc -l)
+echo "* Cartoons ... checking $num_episodes episodes"
+find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '1*.m??' | sort | while read video; do video_encoding $video || video_rsync $video; done
+echo
+
+num_episodes=$(find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '2*.m??' | wc -l)
+echo "* TV Shows ... checking $num_episodes episodes"
+find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '2*.m??' | sort | while read video; do video_encoding $video || video_rsync $video; done
+echo
+
+num_episodes=$(find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '3*.m??' | wc -l)
+echo "* Church Videos ... checking $num_episodes episodes"
+find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '3*.m??' | while read video; do video_encoding $video || video_rsync $video; done
+echo
+
+num_episodes=$(find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '4.*.m??' | wc -l)
+echo "* Movies ... checking $num_episodes episodes"
+find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '4.*.m??' | while read video; do video_encoding $video || video_rsync $video; done
+echo
+
+num_episodes=$(find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '7.*.m??' | wc -l)
+echo "* Documentaries ... checking $num_episodes episodes"
+find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '7.*.m??' | while read video; do video_encoding $video || video_rsync $video; done

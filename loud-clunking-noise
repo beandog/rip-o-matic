@@ -33,6 +33,6 @@ echo "[ `date` - $random_iso_basename ] - Wish-Wash, Encode Starting :)" >> /hom
 cd /home/steve/Videos/Rip-o-Matic/bulky-bottles
 ln -sf "$random_iso" .
 cd ~/Videos/Tails
-/home/steve/Videos/Rip-o-Matic/bulky-bottles/$encode_script 2>&1 "$random_iso_log" | tee -a "$random_iso_log" | egrep '^frame'
+/home/steve/Videos/Rip-o-Matic/bulky-bottles/$encode_script 2>&1 | tee -a "$random_iso_log" 
 echo "[ `date` - $random_iso_basename ] - Fluff-Puff, Encode Finished :D" >> /home/steve/Videos/Rip-o-Matic/event.log
 echo "$random_iso can be safely removed" >> /home/steve/Videos/Rip-o-Matic/event.log
