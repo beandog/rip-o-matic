@@ -1,7 +1,0 @@
-#!/bin/bash
-device=$1
-if [[ -z "$device" ]]; then
-	device=/dev/sr0
-fi
-
-dvdbackup -M -p -i $device
