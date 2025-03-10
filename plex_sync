@@ -1,23 +1,24 @@
 #!/bin/bash
 
+control_c() {
+        exit 1
+}
+trap control_c INT
+
 # Ideally auto-update everything on plex, from copying here to updating there
 
+# Only run one instance of plex_sync
+num_processes=$(pgrep -a -c -f '/bin/bash /home/steve/bin/plex_sync')
+if [[ "$num_processes" -gt 1 ]]; then echo 'plex_sync already running'; exit 1; fi
+
 # Settings for find
-find_options="-mmin -120"
+find_options="-mmin -240"
 
 # Override
 if [[ "$1" == "all" ]]; then find_options=; fi
 
 # Use DLNA Library as master target -- if it is there, do not update it
-rsync_options="-u --progress"
-rsync_options_hq="-u --progress"
-
-control_c() {
-	echo "Exiting quietly"
-	exit 1
-}
-
-trap control_c INT
+rsync_options="--no-motd -u --progress"
 
 function video_encoding {
 
@@ -30,11 +31,15 @@ function video_encoding {
 
 function video_rsync {
 	video=$1
-	if [[ ${video:0:1} == "1" ]]; then
-		rsync $rsync_options /home/steve/Videos/Plex/$video dlna.beandog.org:~/Library
-	else
-		rsync $rsync_options /home/steve/Videos/Plex/$video dlna.beandog.org:/opt/plex/sd/HEVC
+	num_processes=$(pgrep -c -f "progress /home/steve/Videos/Plex/$video")
+	if [[ "$num_processes" -gt 0 ]]; then return 1; fi
+	episode=$(basename $1)
+	collection_id=${episode:0:1}
+	sync_dir="/opt/plex/sd"
+	if [[ "$collection_id" == "2" ]]; then
+		sync_dir="/opt/plex/tv"
 	fi
+	rsync $rsync_options /home/steve/Videos/Plex/$video dlna.beandog.org:$sync_dir
 	return $?
 }
 
