@@ -1,6 +1,0 @@
-#!/bin/bash
-for x in *.mkv; do
-	old=$x
-	new=`echo $x | tr '_' ' '`
-	if [[ "$old" != "$new" ]]; then mv "$x" "$new"; fi
-done
