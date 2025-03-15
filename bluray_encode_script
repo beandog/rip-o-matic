@@ -1,0 +1,41 @@
+#!/bin/bash
+
+header="#!/bin/bash
+control_c() {
+        exit 1
+}
+trap control_c INT"
+
+function is_bluray {
+
+	device="$(realpath $1)"
+	test -z "$device" && return 1
+	test -e "$device" || return 1
+	test "$device" == "/dev/dvd" && return 0
+	test "$device" == "/dev/sr0" && return 0
+	test "$device" == "/dev/sr1" && return 0
+	test "${device: -3}" == "iso" && return 0
+	test -d "${device}/BDMV" && return 0
+	test -d "BDMV" && return 0
+
+	return 1
+
+}
+
+devices=$*
+if [[ -z "$devices" ]]; then devices=/dev/sr1; fi
+
+for iso in $devices; do
+
+	is_bluray "$iso" || continue
+
+	filename="`basename \"$iso\" .iso`.sh"
+	test -e "$filename" && rm "$filename"
+	content=$(dart --encode-info --skip-existing --time --log-progress "$iso" | egrep "(bluray_info|bluray_copy|mkvmerge|ffmpeg|tout)")
+	test -z "$content" && continue
+	echo "$header" > "$filename"
+	echo "$content" >> "$filename"
+	realpath=$(realpath "$filename")
+	chmod +x "$filename"
+
+done
