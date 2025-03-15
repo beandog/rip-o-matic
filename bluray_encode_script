@@ -29,7 +29,7 @@ for iso in $devices; do
 
 	is_bluray "$iso" || continue
 
-	filename="`basename \"$iso\" .iso`.sh"
+	filename="enc-`basename \"$iso\" .iso`.sh"
 	test -e "$filename" && rm "$filename"
 	content=$(dart --encode-info --skip-existing --time "$iso" | egrep "(bluray_info|bluray_copy|mkvmerge|ffmpeg|tout)")
 	test -z "$content" && continue
