@@ -18,7 +18,7 @@ find_options="-mmin -240"
 if [[ "$1" == "all" ]]; then find_options=; fi
 
 # Use DLNA Library as master target -- if it is there, do not update it
-rsync_options="--no-motd -u --progress"
+rsync_options="--no-motd -u --progress --no-compress"
 
 function video_encoding {
 
