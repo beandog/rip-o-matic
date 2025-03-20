@@ -17,7 +17,7 @@ for video in $*; do
 	src="$video"
 	video=`basename "$video"`
 	progressive=0
-	fps=0
+	fps=
 	display=
 
 	get_height=0
@@ -57,9 +57,9 @@ for video in $*; do
 		elif [[ "$fps" == "60.000" ]]; then fps=60;
 		fi
 	fi
-	if [[ "$get_height" == 1 ]] && [[ "$progressive" == 1 ]] && [[ "$fps" -ge 24 ]]; then
+	# if [[ "$get_height" == 1 ]] && [[ "$progressive" == 1 ]] && [[ "$fps" -ge 24 ]]; then
 		display="${height}p${fps}"
-	fi
+	# fi
 
 	preset=
 	if [[ "$format" == "AVC" ]]; then
@@ -120,10 +120,11 @@ for video in $*; do
 	if [[ ! -z "$preset" ]]; then avcinfo="${avcinfo}$preset "; fi
 	if [[ ! -z "$crf" ]]; then avcinfo="${avcinfo}$crf "; fi
 	if [[ ! -z "$qp" ]] && [[ "$qp" -eq "0" ]]; then avcinfo="${avcinfo}lossless "; fi
-	if [[ ! -z "$display" ]]; then avcinfo="${avcinfo}- $display "; fi
 	avcimport="${avcinfo:27}"
+	if [[ ! -z "$display" ]]; then avcinfo="${avcinfo}- $display "; fi
 	if [[ ! -z "$mbs" ]]; then avcinfo="${avcinfo}- $mbs MBs"; fi
 	if [[ ! -z "$duration" ]]; then avcinfo="${avcinfo} -$duration"; fi
+	if [[ ! -z "$duration" ]]; then avcimport="${avcimport} -$duration"; fi
 	echo $avcinfo
 
 	pgrep -c -f "HandBrakeCLI.*$video" &> /dev/null && continue
