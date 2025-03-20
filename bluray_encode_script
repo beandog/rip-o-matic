@@ -14,6 +14,7 @@ function is_bluray {
 	test "$device" == "/dev/dvd" && return 0
 	test "$device" == "/dev/sr0" && return 0
 	test "$device" == "/dev/sr1" && return 0
+	test "$device" == "/dev/uhd" && return 0
 	test "${device: -3}" == "iso" && return 0
 	test -d "${device}/BDMV" && return 0
 	test -d "BDMV" && return 0
@@ -23,7 +24,7 @@ function is_bluray {
 }
 
 devices=$*
-if [[ -z "$devices" ]]; then devices=/dev/sr1; fi
+if [[ -z "$devices" ]]; then devices=/dev/sr0; fi
 
 for iso in $devices; do
 
