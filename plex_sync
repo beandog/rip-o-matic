@@ -24,13 +24,14 @@ function video_encoding {
 
 	video=$1
 	video=$(basename $video)
-	num_processes=$(pgrep -c -f "output $video")
+	num_processes=$(pgrep -c -f "$video")
 	if [[ "$num_processes" -gt 0 ]]; then return 0; else return 1; fi
 
 }
 
 function video_rsync {
 	video=$1
+	echo "[$video]"
 	num_processes=$(pgrep -c -f "progress /home/steve/Videos/Tails/$video")
 	if [[ "$num_processes" -gt 0 ]]; then return 1; fi
 	episode=$(basename $1)
@@ -39,7 +40,9 @@ function video_rsync {
 	if [[ "$collection_id" == "2" ]]; then
 		sync_dir="/opt/plex/tv"
 	fi
-	rsync $rsync_options /home/steve/Videos/Tails/$video dlna.beandog.org:$sync_dir
+	echo "'/home/steve/Videos/Tails/$video' -> 'dlna.beandog.org:$sync_dir'"
+	echo
+	rsync $rsync_options -v /home/steve/Videos/Tails/$video dlna.beandog.org:$sync_dir
 	return $?
 }
 
