@@ -24,7 +24,13 @@ function is_bluray {
 }
 
 devices=$*
-if [[ -z "$devices" ]]; then devices=/dev/sr0; fi
+if [[ -z "$devices" ]]; then
+	if [[ "`hostname | cut -d '.' -f 1`" == "tails" ]]; then
+		devices=/dev/sr0
+	else
+		devices=/dev/sr1
+	fi
+fi
 
 for iso in $devices; do
 
