@@ -32,7 +32,7 @@ for iso in $devices; do
 
 	filename="enc-`basename \"$iso\" .iso`.sh"
 	test -e "$filename" && rm "$filename"
-	content=$(dart --encode-info --skip-existing --time "$iso" | egrep "(bluray_info|bluray_copy|mkvmerge|ffmpeg|tout)")
+	content=$(dart --encode-info --ffpipe --skip-existing --time "$iso" | egrep "(bluray_copy|ffmpeg|tout)")
 	test -z "$content" && continue
 	echo "$header" > "$filename"
 	echo "$content" >> "$filename"
