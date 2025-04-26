@@ -23,8 +23,6 @@ fi
 
 random_iso_log="/home/steve/Videos/Rip-o-Matic/catch-alot/$random_iso_basename.log"
 touch "$random_iso_log"
-dvd_query -e -x "$random_iso"
-if [[ $? -ne 0 ]]; then echo "dvd_query failed, exiting"; exit 1; fi
 encode_script="$(basename enc-$random_iso_basename .iso).sh"
 /home/steve/bin/dvd_encode_script "$random_iso"
 if [[ ! -e "$encode_script" ]]; then echo "no encode script created, exiting"; exit 1; fi
