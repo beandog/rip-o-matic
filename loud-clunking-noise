@@ -8,14 +8,6 @@ if [[ "$is_encoding" -ge 1 ]]; then echo "$random_iso_basename - DVD already bei
 
 # Check to see if there are remaining episodes.
 num_not_encoded=$(dart --episode-filenames "$random_iso" --skip-existing | wc -l)
-exit_code=$?
-# process dvd_query exit codes
-if [[ $exit_code -eq 1 ]]; then
-	echo "$random_iso_basename - dvd_query failed on processing arguments"
-elif [[ $exit_code -eq 2 ]]; then
-	echo "$random_iso_basename - No episodes are listed for this DVD"
-	exit 1;
-fi
 if [[ "$num_not_encoded" -eq 0 ]]; then
 	echo "$random_iso_basename - DVD already encoded, spin again"
 	exit 1
