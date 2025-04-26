@@ -6,9 +6,6 @@ enabled=yes
 archive_dvds=yes
 rip_dvds=yes
 
-bluray=no
-bluray_dir=/home/steve/Media/Blu-rays/USB
-
 event_log="/home/steve/Videos/Rip-o-Matic/event.log"
 
 function usage {
@@ -42,7 +39,7 @@ fi
 # echo volume $volume
 if [[ -z "$device" && -z "$disc_type" ]]; then usage; exit 1; fi
 
-if [[ "$disc_type" == "bd" && "$bluray" == "no" ]]; then exit 0; fi
+if [[ "$disc_type" == "bd" ]]; then exit 0; fi
 
 # cd /home/steve/Media/Laundry-Basket
 # cd /home/steve/Media/Storage-Closet
@@ -74,8 +71,6 @@ dvd_eject -t $device
 
 if [[ "$disc_type" == "dvd" ]]; then
 	echo "[ `date` $device - $volume ] DVD Detected" >> $event_log
-elif [[ "$disc_type" == "bluray" ]]; then
-	echo "[ `date` $device - $volume ] Blu-ray Detected" >> $event_log
 fi
 
 test $archive_dvds == "yes" && /home/steve/bin/dart --info $device >> $event_log
@@ -103,55 +98,6 @@ if [[ "$rip_dvds" == "yes" ]] && [[ "$disc_type" == "dvd" ]]; then
 		echo "[ `date` $device - $volume ] DVD Ejected" >> $event_log
 		/home/steve/bin/dart --rename-iso "$dvdbackup_dir_arg"
 	fi
-
-fi
-
-if [[ "$rip_dvds" == "yes" ]] && [[ "$disc_type" == "bd" ]]; then
-
-	bluray_iso="$(/home/steve/bin/dart --iso-filename $device)"
-
-	if [[ -z "$bluray_iso" ]]; then
-		echo "[ `date ` $device - $volume ] Could not find ISO filename " >> $event_log
-		exit 1
-	fi
-
-	echo "[ `date ` $device - $volume ] Matched ISO - $bluray_iso " >> $event_log
-	iso_dir="${bluray_dir}/${bluray_iso}"
-	if [[ ! -d "$iso_dir" ]]; then
-		mkdir "${bluray_dir}/${bluray_iso}" || exit
-	fi
-	bluray_encode_script=`tempfile -p bd_`
-	cd "$iso_dir"
-	/home/steve/bin/dart --encode-info --skip-existing $device > "$bluray_encode_script" || exit 1
-	test -e "$bluray_encode_script" || exit 1
-	chmod +x "$bluray_encode_script" || exit 1
-	bluray_mkvmerge_script=`tempfile -p bd_`
-	grep ^mkvmerge "$bluray_encode_script" > "$bluray_mkvmerge_script"
-	if [[ $? -ne 0 ]]; then
-		eject $device
-		# rm "$bluray_mkvmerge_script"
-		exit 0
-	fi
-	chmod +x "$bluray_mkvmerge_script" || exit 1
-	bluray_xchap_script=`tempfile -p bd_`
-	grep xchap "$bluray_encode_script" > $bluray_xchap_script
-	if [[ $? -eq 0 ]]; then
-		echo "[ `date` $device - $volume ] Blu-ray Ripping Chapters" >> $event_log
-		chmod +x $bluray_xchap_script
-		$bluray_xchap_script >> $dvdbackup_log
-	fi
-	# rm $bluray_xchap_script
-	bluray_copy_script=`tempfile -p bd_`
-	grep ^bluray_copy "$bluray_encode_script" > $bluray_copy_script
-	if [[ $? -eq 0 ]]; then
-		echo "[ `date` $device - $volume ] Blu-ray Ripping Playlists" >> $event_log
-		chmod +x $bluray_copy_script
-		$bluray_copy_script >> $dvdbackup_log
-	fi
-	# rm $bluray_copy_script
-	eject $device
-	echo "[ `date` $device - $volume ] Blu-ray Muxing Files" >> $event_log
-	$bluray_mkvmerge_script
 
 fi
 
