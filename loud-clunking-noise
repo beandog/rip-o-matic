@@ -23,12 +23,11 @@ fi
 
 random_iso_log="/home/steve/Videos/Rip-o-Matic/catch-alot/$random_iso_basename.log"
 touch "$random_iso_log"
+cd /home/steve/Videos/Rip-o-Matic/bulky-bottles
 encode_script="$(basename enc-$random_iso_basename .iso).sh"
 /home/steve/bin/dvd_encode_script "$random_iso"
 if [[ ! -e "$encode_script" ]]; then echo "no encode script created, exiting"; exit 1; fi
-mv $encode_script /home/steve/Videos/Rip-o-Matic/bulky-bottles/
 echo "[ `date` - $random_iso_basename ] - Wish-Wash, Encode Starting :)" >> /home/steve/Videos/Rip-o-Matic/event.log
-cd /home/steve/Videos/Rip-o-Matic/bulky-bottles
 ln -sf "$random_iso" .
 cd ~/Videos/Tails
 /home/steve/Videos/Rip-o-Matic/bulky-bottles/$encode_script 2>&1 | tee -a "$random_iso_log" 
