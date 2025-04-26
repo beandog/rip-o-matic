@@ -41,17 +41,9 @@ if [[ -z "$device" && -z "$disc_type" ]]; then usage; exit 1; fi
 
 if [[ "$disc_type" == "bd" ]]; then exit 0; fi
 
-# cd /home/steve/Media/Laundry-Basket
+cd /home/steve/Media/Laundry-Basket
 # cd /home/steve/Media/Storage-Closet
-# cd /home/steve/Videos/Rip-o-Matic
-# cd /home/steve/Media/Laundry-Basket/HQ
 cd /home/steve/Media/Laundry-Basket/On-Deck
-# cd /home/steve/Videos/DVDs/Storage-Closet
-# if [[ "$device" == "/dev/sr0" ]]; then
-# 	cd /home/steve/Media/Cartoons
-# else
-# 	cd /home/steve/Media/Laundry-Basket/Cool-Blankets
-# fi
 
 event_log="/home/steve/Videos/Rip-o-Matic/event.log"
 dev_basename=$(basename $device)
