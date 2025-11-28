@@ -1,6 +1,4 @@
-#!/bin/bash -x
-
-echo $*
+#!/bin/bash
 
 enabled=yes
 archive_dvds=yes
@@ -43,7 +41,7 @@ if [[ "$disc_type" == "bd" ]]; then exit 0; fi
 
 cd /home/steve/Media/Laundry-Basket
 # cd /home/steve/Media/Storage-Closet
-cd /home/steve/Media/Laundry-Basket/On-Deck
+# cd /home/steve/Media/Laundry-Basket/On-Deck
 
 event_log="/home/steve/Videos/Rip-o-Matic/event.log"
 dev_basename=$(basename $device)

@@ -1,8 +1,14 @@
 #!/bin/bash
-cd /home/steve/Videos/Tails
+control_c() {
+        exit 1
+}
+trap control_c INT
+echo "It's time to make the donuts ... I mean, do the laundry!"
+cd ~/Videos/Plex
 random_iso="$(/home/steve/Videos/Rip-o-Matic/wheel-o-fun)"
 test -z "$random_iso" && exit
 random_iso_basename="$(basename $random_iso)"
+echo "Who left out $random_iso_basename to be cleaned?!"
 is_encoding="$(pgrep -f "ffmpeg.+$random_iso_basename" -c)"
 if [[ "$is_encoding" -ge 1 ]]; then echo "$random_iso_basename - DVD already being washed, spin again"; exit 1; fi
 
@@ -15,13 +21,15 @@ fi
 
 random_iso_log="/home/steve/Videos/Rip-o-Matic/catch-alot/$random_iso_basename.log"
 touch "$random_iso_log"
-cd /home/steve/Videos/Rip-o-Matic/bulky-bottles
+cd ~/Videos/Rip-o-Matic/bulky-bottles
 encode_script="$(basename enc-$random_iso_basename .iso).sh"
-/home/steve/bin/dvd_encode_script "$random_iso"
+~/bin/dvd_encode_script "$random_iso"
 if [[ ! -e "$encode_script" ]]; then echo "no encode script created, exiting"; exit 1; fi
-echo "[ `date` - $random_iso_basename ] - Wish-Wash, Encode Starting :)" >> /home/steve/Videos/Rip-o-Matic/event.log
+echo "[ `date` - $random_iso_basename ] - Wish-Wash, Encode Starting :)" | tee -a ~/Videos/Rip-o-Matic/event.log
 ln -sf "$random_iso" .
-cd ~/Videos/Tails
-/home/steve/Videos/Rip-o-Matic/bulky-bottles/$encode_script 2>&1 | tee -a "$random_iso_log" 
-echo "[ `date` - $random_iso_basename ] - Fluff-Puff, Encode Finished :D" >> /home/steve/Videos/Rip-o-Matic/event.log
-echo "$random_iso can be safely removed" >> /home/steve/Videos/Rip-o-Matic/event.log
+cp "$encode_script" ~/Videos/Plex
+cd ~/Videos/Plex
+rm $random_iso_log 2> /dev/null
+~/Videos/Rip-o-Matic/bulky-bottles/$encode_script 2> "$random_iso_log"
+echo "[ `date` - $random_iso_basename ] - Fluff-Puff, Encode Finished :D" | tee -a ~/Videos/Rip-o-Matic/event.log
+echo "$random_iso can be safely removed" | tee -a /home/steve/Videos/Rip-o-Matic/event.log
