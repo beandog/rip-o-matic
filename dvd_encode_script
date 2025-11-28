@@ -13,8 +13,7 @@ function is_dvd {
 	test -e "$device" || return 1
 	test "$device" == "/dev/sr0" && return 0
 	test "$device" == "/dev/sr1" && return 0
-	test "$device" == "/dev/cd0" && return 0
-	test "$device" == "/dev/cd1" && return 0
+	test "$device" == "/dev/sr2" && return 0
 	test "${device: -3}" == "iso" && return 0
 	test "${device: -8}" == "VIDEO_TS" && return 0
 	test -d "${device}/BDMV" && return 0
@@ -23,10 +22,8 @@ function is_dvd {
 
 }
 
-dvds="$*"
-os=$(uname)
-if [[ -z "$dvds" ]] && [[ "$os" == "Linux" ]]; then dvds=/dev/sr0; fi
-if [[ -z "$dvds" ]] && [[ "$os" == "FreeBSD" ]]; then dvds=/dev/cd0; fi
+dvds="$@"
+if [[ -z "$dvds" ]]; then dvds=/dev/sr0; fi
 
 for iso in $dvds; do
 
@@ -35,11 +32,10 @@ for iso in $dvds; do
 	filename="enc-`basename \"$iso\" .iso`.sh"
 	test -e "$filename" && rm "$filename"
 
-	content=$(dart --encode-info --skip-existing --time --log-progress "$iso" | egrep "(^HandBrakeCLI|dvd_info|bluray_info|bluray_copy|mkvmerge|dvd_rip|dvd_copy|ffmpeg|tout)")
+	content=$(dart --encode-info --skip-existing --test-existing --time --log-progress "$iso" | egrep "(^HandBrakeCLI|dvd_info|bluray_info|bluray_copy|mkvmerge|dvd_rip|dvd_copy|ffmpeg|tout)")
 
 	test -z "$content" && continue
 	echo "$header" > "$filename"
-	echo \# `ffmpeg -version | head -n 1` >> "$filename"
 	echo "$content" >> "$filename"
 	realpath=$(realpath "$filename")
 	chmod +x "$filename"
