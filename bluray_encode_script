@@ -13,6 +13,7 @@ function is_bluray {
 	test -e "$device" || return 1
 	test "$device" == "/dev/sr0" && return 0
 	test "$device" == "/dev/sr1" && return 0
+	test "$device" == "/dev/sr2" && return 0
 	test "$device" == "/dev/uhd" && return 0
 	test "${device: -3}" == "iso" && return 0
 	test -d "${device}/BDMV" && return 0
@@ -22,14 +23,8 @@ function is_bluray {
 
 }
 
-devices=$*
-if [[ -z "$devices" ]]; then
-	if [[ "`hostname | cut -d '.' -f 1`" == "tails" ]]; then
-		devices=/dev/sr0
-	else
-		devices=/dev/sr1
-	fi
-fi
+devices="$@"
+if [[ -z "$devices" ]]; then devices=/dev/sr0; fi
 
 for iso in $devices; do
 
@@ -37,7 +32,7 @@ for iso in $devices; do
 
 	filename="enc-`basename \"$iso\" .iso`.sh"
 	test -e "$filename" && rm "$filename"
-	content=$(dart --encode-info --skip-existing --time --log-progress "$iso" | egrep "(^bluray_info|bluray_copy|mkvmerge|bluray_rip|ffmpeg|tout)")
+	content=$(dart --encode-info --skip-existing --time --log-progress "$iso" | egrep '^(bluray_info|bluray_copy|ffmpeg|mkvmerge|HandBrakeCLI)')
 	test -z "$content" && continue
 	echo "$header" > "$filename"
 	echo "$content" >> "$filename"
