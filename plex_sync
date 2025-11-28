@@ -18,13 +18,13 @@ find_options="-mmin -240"
 if [[ "$1" == "all" ]]; then find_options=; fi
 
 # Use DLNA Library as master target -- if it is there, do not update it
-rsync_options="--no-motd -u --progress --no-compress"
+rsync_options="--update --progress --times --no-compress"
 
 function video_encoding {
 
 	video=$1
 	video=$(basename $video)
-	num_processes=$(pgrep -c -f "$video")
+	num_processes=$(pgrep -c -f "output $video")
 	if [[ "$num_processes" -gt 0 ]]; then return 0; else return 1; fi
 
 }
@@ -32,7 +32,7 @@ function video_encoding {
 function video_rsync {
 	video=$1
 	echo "[$video]"
-	num_processes=$(pgrep -c -f "progress /home/steve/Videos/Tails/$video")
+	num_processes=$(pgrep -c -f "progress /home/steve/Videos/Plex/$video")
 	if [[ "$num_processes" -gt 0 ]]; then return 1; fi
 	episode=$(basename $1)
 	collection_id=${episode:0:1}
@@ -40,35 +40,37 @@ function video_rsync {
 	if [[ "$collection_id" == "2" ]]; then
 		sync_dir="/opt/plex/tv"
 	fi
-	echo "'/home/steve/Videos/Tails/$video' -> 'dlna.beandog.org:$sync_dir'"
-	echo
-	rsync $rsync_options -v /home/steve/Videos/Tails/$video dlna.beandog.org:$sync_dir
+	echo "'/home/steve/Videos/Plex/$video' -> 'dlna.beandog.org:$sync_dir'"
+	rsync $rsync_options /home/steve/Videos/Plex/$video dlna.beandog.org:$sync_dir
 	return $?
 }
 
 echo "[PLEX] - Episode Sync"
 echo
 
-num_episodes=$(find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '1*.m??' | wc -l)
+num_episodes=$(find "/home/steve/Videos/Plex/" -mindepth 1 -maxdepth 1 $find_options -name '1*.m??' | wc -l)
 echo "* Cartoons ... checking $num_episodes episodes"
-find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '1*.m??' | sort | while read video; do video_encoding $video || video_rsync $video; done
+find "/home/steve/Videos/Plex/" -mindepth 1 -maxdepth 1 $find_options -name '1*.m??' | sort | while read video; do video_encoding $video || video_rsync $video; done
 echo
 
-num_episodes=$(find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '2*.m??' | wc -l)
+num_episodes=$(find "/home/steve/Videos/Plex/" -mindepth 1 -maxdepth 1 $find_options -name '2*.m??' | wc -l)
 echo "* TV Shows ... checking $num_episodes episodes"
-find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '2*.m??' | sort | while read video; do video_encoding $video || video_rsync $video; done
+find "/home/steve/Videos/Plex/" -mindepth 1 -maxdepth 1 $find_options -name '2*.m??' | sort | while read video; do video_encoding $video || video_rsync $video; done
 echo
 
-num_episodes=$(find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '3*.m??' | wc -l)
+# **** Stopping here while just doing cartoons and TV shows ****
+exit
+
+num_episodes=$(find "/home/steve/Videos/Plex/" -mindepth 1 -maxdepth 1 $find_options -name '3*.m??' | wc -l)
 echo "* Church Videos ... checking $num_episodes episodes"
-find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '3*.m??' | while read video; do video_encoding $video || video_rsync $video; done
+find "/home/steve/Videos/Plex/" -mindepth 1 -maxdepth 1 $find_options -name '3*.m??' | while read video; do video_encoding $video || video_rsync $video; done
 echo
 
-num_episodes=$(find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '4.*.m??' | wc -l)
+num_episodes=$(find "/home/steve/Videos/Plex/" -mindepth 1 -maxdepth 1 $find_options -name '4.*.m??' | wc -l)
 echo "* Movies ... checking $num_episodes episodes"
-find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '4.*.m??' | while read video; do video_encoding $video || video_rsync $video; done
+find "/home/steve/Videos/Plex/" -mindepth 1 -maxdepth 1 $find_options -name '4.*.m??' | while read video; do video_encoding $video || video_rsync $video; done
 echo
 
-num_episodes=$(find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '7.*.m??' | wc -l)
+num_episodes=$(find "/home/steve/Videos/Plex/" -mindepth 1 -maxdepth 1 $find_options -name '7.*.m??' | wc -l)
 echo "* Documentaries ... checking $num_episodes episodes"
-find "/home/steve/Videos/Tails/" -mindepth 1 -maxdepth 1 $find_options -name '7.*.m??' | while read video; do video_encoding $video || video_rsync $video; done
+find "/home/steve/Videos/Plex/" -mindepth 1 -maxdepth 1 $find_options -name '7.*.m??' | while read video; do video_encoding $video || video_rsync $video; done
