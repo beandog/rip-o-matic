@@ -1,0 +1,2 @@
+#!/bin/bash
+rsync -uvrltD --progress "$@" dlna:/opt/jfin/libraries/tails
