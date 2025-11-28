@@ -1,0 +1,8 @@
+#!/bin/bash
+filename=$1
+if [[ ${0: -2} == "sh" ]] || [[ ${1: -2} == "sh" ]]; then
+	confcat "$filename" >> time.out
+else
+ 	echo "$*" >> time.out
+fi
+command time -f %E -a -o time.out -- $*
