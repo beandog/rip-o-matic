@@ -1,0 +1,2 @@
+#!/bin/bash
+pgrep -l ^rsync -a | cut -d ' ' -f 2-
