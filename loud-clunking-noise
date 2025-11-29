@@ -4,6 +4,7 @@ control_c() {
 }
 trap control_c INT
 echo "It's time to make the donuts ... I mean, do the laundry!"
+while true; do
 cd ~/Videos/Plex
 random_iso="$(/home/steve/Videos/Rip-o-Matic/wheel-o-fun)"
 test -z "$random_iso" && exit
@@ -33,3 +34,4 @@ rm $random_iso_log 2> /dev/null
 ~/Videos/Rip-o-Matic/bulky-bottles/$encode_script 2> "$random_iso_log"
 echo "[ `date` - $random_iso_basename ] - Fluff-Puff, Encode Finished :D" | tee -a ~/Videos/Rip-o-Matic/event.log
 echo "$random_iso can be safely removed" | tee -a /home/steve/Videos/Rip-o-Matic/event.log
+done
