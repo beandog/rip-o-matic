@@ -1,2 +1,3 @@
 #!/bin/bash
 pgrep -l ^HandBrakeCLI -a | rev | cut -d ' ' -f 1 | rev | while read line; do echo "# $line - HandBrakeCLI"; done
+pgrep -l ^ffmpeg -a | rev | cut -d ' ' -f 1 | rev | while read line; do echo "# $line - ffmpeg"; done
