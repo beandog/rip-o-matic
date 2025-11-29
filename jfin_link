@@ -49,7 +49,7 @@ for video in $*; do
 	fi
 
 	# Use episode_query to find what Plex directory it should be sorted into
-	jfin_video_dirname=`/root/bin/episode_query --jfin --dirname "$video_episode"`
+	jfin_video_dirname=`episode_query --jfin --dirname "$video_episode"`
 
 	# Quit if dirname is empty, indicates that file is not in database
 	if [[ "$jfin_video_dirname" == "/" ]]; then echo jfin_link: episode not in database - $video_basename; continue; fi
@@ -60,7 +60,7 @@ for video in $*; do
 	if [[ $? -ne 0 ]]; then echo jfin_link: episode_query --jfin --dirname $video_basename failed; continue; fi
 
 	# Same sequence for filename
-	jfin_video_filename=`/root/bin/episode_query --jfin "$video_episode"`
+	jfin_video_filename=`episode_query --jfin "$video_episode"`
 	if [[ $? -ne 0 ]]; then echo jfin_link: episode_query $video_basename failed; continue; fi
 
 	if [[ ! -d "$jfin_video_dirname" ]]; then doas -u jellyfin -- mkdir -p "$jfin_video_dirname"; fi
