@@ -1,0 +1,5 @@
+#!/bin/bash
+# pgrep -l ^HandBrakeCLI -a | rev | cut -d ' ' -f 1 | rev | while read line; do emo --info "$line"; done
+pgrep -l ^HandBrakeCLI -a | while read line; do echo -n "# "; echo $line | cut -d ' ' -f 2-;done
+# pgrep -l ^ffmpeg -a | rev | cut -d ' ' -f 1 | rev | while read line; do emo --info "$line"; done
+# pgrep -l ^ffmpeg -a
