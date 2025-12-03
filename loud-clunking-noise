@@ -8,17 +8,20 @@ while true; do
 # cd ~/Videos/Plex
 cd /media/steve/XFS-V2
 random_iso="$(/home/steve/Videos/Rip-o-Matic/wheel-o-fun)"
-test -z "$random_iso" && exit
+test -z "$random_iso" && break
 random_iso_basename="$(basename $random_iso)"
 echo "Who left out $random_iso_basename to be cleaned?!"
 is_encoding="$(pgrep -f "ffmpeg.+$random_iso_basename" -c)"
-if [[ "$is_encoding" -ge 1 ]]; then echo "$random_iso_basename - DVD already being washed, spin again"; exit 1; fi
+if [[ "$is_encoding" -ge 1 ]]; then
+	echo "$random_iso_basename - DVD already being washed, spin again"
+	break
+fi
 
 # Check to see if there are remaining episodes.
 num_not_encoded=$(dart --episode-filenames "$random_iso" --skip-existing | wc -l)
 if [[ "$num_not_encoded" -eq 0 ]]; then
 	echo "$random_iso_basename - DVD already encoded, spin again"
-	exit 1
+	break
 fi
 
 random_iso_log="/home/steve/Videos/Rip-o-Matic/catch-alot/$random_iso_basename.log"
@@ -26,7 +29,10 @@ touch "$random_iso_log"
 cd ~/Videos/Rip-o-Matic/bulky-bottles
 encode_script="$(basename enc-$random_iso_basename .iso).sh"
 ~/bin/dvd_encode_script "$random_iso"
-if [[ ! -e "$encode_script" ]]; then echo "no encode script created, exiting"; exit 1; fi
+if [[ ! -e "$encode_script" ]]; then
+	echo "no encode script created, exiting"
+	break
+fi
 echo "[ `date` - $random_iso_basename ] - Wish-Wash, Encode Starting :)" | tee -a ~/Videos/Rip-o-Matic/event.log
 ln -sf "$random_iso" .
 cp "$encode_script" ~/Videos/Plex
