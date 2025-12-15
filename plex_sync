@@ -5,8 +5,8 @@ control_c() {
 }
 trap control_c INT
 
-emo --upload $(find /media/steve/XFS-V2 -name '*mkv' -mmin -8)
-emo --upload $(find /home/steve/Videos/Plex -name '*mkv' -mmin -8)
+emo --upload $(find /media/steve/XFS-V2 -mindepth 1 -maxdepth 1 -name '*mkv' -mmin -8)
+emo --upload $(find /home/steve/Videos/Plex -mindepth 1 -maxdepth 1 -name '*mkv' -mmin -8)
 exit
 
 # Ideally auto-update everything on plex, from copying here to updating there
