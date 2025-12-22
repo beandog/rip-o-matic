@@ -32,7 +32,7 @@ for iso in $dvds; do
 	filename="enc-`basename \"$iso\" .iso`.sh"
 	test -e "$filename" && rm "$filename"
 
-	content=$(dart --encode-info --skip-existing --test-existing --time --log-progress "$iso" | egrep "(^HandBrakeCLI|dvd_info|bluray_info|bluray_copy|mkvmerge|dvd_rip|dvd_copy|ffmpeg|tout)")
+	content=$(dart --encode-info --skip-existing --test-existing --time --log-progress "$iso" | grep -E "(^HandBrakeCLI|dvd_info|bluray_info|bluray_copy|mkvmerge|dvd_rip|dvd_copy|ffmpeg|tout)")
 
 	test -z "$content" && continue
 	echo "$header" > "$filename"
