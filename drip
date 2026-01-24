@@ -1,0 +1,12 @@
+#!/bin/bash
+control_c() {
+        exit 1
+}
+trap control_c SIGINT
+
+dvds="$@"
+if [[ -z "$dvds" ]]; then exit; fi
+
+for iso in $dvds; do
+	dart --encode --skip-existing --test-existing --time --log-progress "$iso"
+done
