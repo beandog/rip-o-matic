@@ -2,4 +2,4 @@ all:
 	gcc -o dvd_bounce dvd_bounce.c
 
 install:
-	for x in bluray_encode_script confcat drip dvd_bounce dvd_encode_script jfin_link lsencodes lshb lsports lssync plex_link plex_sync tout volname; do doas ln -sf `realpath $$x` /usr/local/bin/; done
+	for x in bluray_encode_script confcat drip dvd_bounce dvd_encode_script jfin_link lsencodes lshb lsservices lsports lssync lsinstalled plex_link plex_sync tout volname; do doas ln -sf `realpath $$x` /usr/local/bin/; done
