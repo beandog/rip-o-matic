@@ -1,0 +1,6 @@
+#!/bin/bash
+/usr/bin/findmnt /opt/plex/bd || exit 1
+/usr/bin/findmnt /opt/plex/sd || exit 1
+/usr/bin/findmnt /opt/plex/tv || exit 1
+/usr/bin/findmnt /opt/plex/hd || exit 1
+/usr/sbin/service jellyfin start
