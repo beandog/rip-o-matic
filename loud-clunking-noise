@@ -1,48 +1,38 @@
 #!/bin/bash
-control_c() {
-        exit 1
-}
-trap control_c INT
-echo "It's time to make the donuts ... I mean, do the laundry!"
-laundry_basket="/home/steve/Media/Laundry-Basket"
-export_dir="/media/steve/XFS-V2"
+
+export_dir="/home/steve/Media/Plex"
+
+cd $export_dir
+
+toilet -f future '* Rip-o-Matic *' --filter metal
 
 while true; do
-# cd ~/Videos/Plex
-cd /media/steve/XFS-V2
-random_iso="$(/home/steve/Videos/Rip-o-Matic/wheel-o-fun)"
-test -z "$random_iso" && break
-random_iso_basename="$(basename $random_iso)"
-echo "Who left out $random_iso_basename to be cleaned?!"
 
-# Check to see if there are remaining episodes.
-# num_not_encoded=$(dart --episode-filenames "$random_iso" --skip-existing | wc -l)
-# if [[ "$num_not_encoded" -eq 0 ]]; then
-# 	echo "$random_iso_basename - DVD already encoded, spin again"
-# 	break
-# fi
+	random_iso="$(/home/steve/Videos/Rip-o-Matic/wheel-o-fun)"
+	test -z "$random_iso" && exit
+	random_iso_basename="$(basename $random_iso)"
 
-random_iso_log="/home/steve/Videos/Rip-o-Matic/catch-alot/$random_iso_basename.log"
-touch "$random_iso_log"
-cd ~/Videos/Rip-o-Matic/bulky-bottles
-encode_script="$(basename enc-$random_iso_basename .iso).sh"
-~/bin/dvd_encode_script "$random_iso"
-if [[ ! -e "$encode_script" ]]; then
-	echo "no encode script created, exiting"
-	break
-fi
-echo "[ `date` - $random_iso_basename ] - Wish-Wash, Encode Starting :)" | tee -a ~/Videos/Rip-o-Matic/event.log
-dart --encode --export-dir "$export_dir" "$random_iso"
+	series_id=$(echo $random_iso_basename | cut -d '.' -f 2);
+	dvd_id=$(echo $random_iso_basename | cut -d '.' -f 3);
+	dvd_url_id=$(echo $dvd_id | sed 's/^0*//')
+	series_title=$(psql -h dlna -c "SELECT title FROM series WHERE id = $series_id;" -q --csv dvds | tail -n 1)
+
+	echo "* $series_title ($series_id)"
+	echo "* http://dlna.beandog.org/index.php/dvds/episodes/${dvd_url_id}"
+
+	is_encoding=$(pgrep -l "^(HandBrakeCLI|ffmpeg).+${random_iso_basename}" -c)
+
+	if [[ "$is_encoding" -ge 1 ]]; then echo "* DVD already being washed, spin again"; exit 1; fi
+	# echo "* Ready to wash $random_iso_basename !"
+
+	dart --encode --skip-existing --test-existing --time --log-progress --export-dir "$export_dir" "$random_iso"
+	e=$?
+
+	if [[ $e -ne 0 ]]; then
+		exit 1
+	fi
+
+	echo "[ `date` - $random_iso_basename ] - Fluff-Puff, Encode Finished :D" | tee -a /home/steve/Videos/Rip-o-Matic/event.log
+	echo "$random_iso can be safely removed" | tee -a /home/steve/Videos/Rip-o-Matic/event.log
+
 done
-exit
-
-ln -sf "$random_iso" .
-cp "$encode_script" ~/Videos/Plex
-# cd ~/Videos/Plex
-cd /media/steve/XFS-V2
-rm $random_iso_log 2> /dev/null
-# ~/Videos/Rip-o-Matic/bulky-bottles/$encode_script 2> "$random_iso_log"
-dart --encode "$random_iso_basename"
-echo "[ `date` - $random_iso_basename ] - Fluff-Puff, Encode Finished :D" | tee -a ~/Videos/Rip-o-Matic/event.log
-echo "$random_iso can be safely removed" | tee -a /home/steve/Videos/Rip-o-Matic/event.log
-# done
