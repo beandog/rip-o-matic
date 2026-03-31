@@ -1,1 +1,7 @@
-dpkg -l | grep ^ii | awk '{print $2}' | sort
+#!/bin/bash
+os=$(cat /etc/os-release | grep ^ID | cut -d = -f 2)
+if [[ "$os" == "alpine" ]]; then
+	apk list --installed | sort
+else
+	dpkg -l | grep ^ii | awk '{print $2}' | sort
+fi
