@@ -8,5 +8,6 @@ dvds="$@"
 if [[ -z "$dvds" ]]; then exit; fi
 
 for iso in $dvds; do
+	iso="$(realpath $iso)"
 	dart --encode --verbose --skip-existing --test-existing --time --log-progress "$iso"
 done
