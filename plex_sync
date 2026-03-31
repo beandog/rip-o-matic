@@ -41,9 +41,9 @@ function video_rsync {
 	if [[ "$num_processes" -gt 0 ]]; then return 1; fi
 	episode=$(basename $1)
 	collection_id=${episode:0:1}
-	sync_dir="/opt/plex/sd"
+	sync_dir="/media/sd"
 	if [[ "$collection_id" == "2" ]]; then
-		sync_dir="/opt/plex/tv"
+		sync_dir="/media/tv"
 	fi
 	echo "'/home/steve/Videos/Plex/$video' -> 'dlna.beandog.org:$sync_dir'"
 	rsync $rsync_options /home/steve/Videos/Plex/$video dlna.beandog.org:$sync_dir
