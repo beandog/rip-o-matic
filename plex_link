@@ -22,27 +22,27 @@ for video in $*; do
 
 	# Sort into its library
 	if [[ "$video_library_prefix" == "1" ]]; then
-		video_library="cartoons"
+		video_library="Cartoons"
 	elif [[ "$video_library_prefix" == "2" ]]; then
-		video_library="tv"
-	elif [[ "$video_library_prefix" == "3" ]]; then
-		video_library="jared"
+		video_library="TV Shows"
+	# elif [[ "$video_library_prefix" == "3" ]]; then
+	#	video_library="jared"
 	elif [[ "$video_library_prefix" == "4" ]]; then
-		video_library="movies"
+		video_library="Movies"
 	elif [[ "$video_library_prefix" == "5" ]]; then
-		video_library="imax"
-	elif [[ "$video_library_prefix" == "6" ]]; then
-		video_library="hdtv"
+		video_library="Movies"
+	# elif [[ "$video_library_prefix" == "6" ]]; then
+	# 	video_library="hdtv"
 	elif [[ "$video_library_prefix" == "7" ]]; then
-		video_library="documentary"
+		video_library="Two-Player"
 	elif [[ "$video_library_prefix" == "8" ]]; then
 		if [[ "$video_library_type" == "4K" ]]; then
-			video_library="4k"
+			video_library="4K-UHD"
 		else
-			video_library="bluray"
+			video_library="Blu-rays"
 		fi
 	elif [[ "$video_library_prefix" == "9" ]]; then
-		video_library="holiday"
+		video_library="Movies"
 	else
 		echo "plex_link: library not found $video_basename"
 		continue
@@ -54,7 +54,7 @@ for video in $*; do
 	# Quit if dirname is empty, indicates that file is not in database
 	if [[ "$plex_video_dirname" == "/" ]]; then echo plex_link: episode not in database - $video_basename; continue; fi
 
-	plex_video_dirname="/opt/plex/libraries/${video_library}/$plex_video_dirname"
+	plex_video_dirname="/home/beandog/Libraries/${video_library}/$plex_video_dirname"
 
 	# Quit if episode_query died for some reason
 	if [[ $? -ne 0 ]]; then echo plex_link: episode_query --dirname $video_basename failed; continue; fi
