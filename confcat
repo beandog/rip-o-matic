@@ -1,1 +1,2 @@
+#!/bin/bash
 grep -vh '^#' "$@" | grep -v '^$' | grep -v "^;" | egrep -v "^\s*$"
