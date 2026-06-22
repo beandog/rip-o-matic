@@ -7,6 +7,12 @@ trap control_c SIGINT
 dvds="$@"
 if [[ -z "$dvds" ]]; then exit; fi
 
+eject=""
+if [[ $(uname -n) = "tobe.beandog.org" ]]; then
+	eject="--eject"
+fi
+
 for iso in $dvds; do
-	ionice -c 2 -n 7 dart --encode --verbose --skip-existing --test-existing --time --log-progress "$iso"
+	iso="$(realpath $iso)"
+	ionice -c 2 -n 7 dart --encode --verbose --skip-existing --test-existing --time --log-progress "$iso" $eject
 done
