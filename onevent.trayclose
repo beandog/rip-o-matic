@@ -1,2 +1,2 @@
 #!/bin/bash
-echo "/usr/bin/doas -u steve /usr/bin/php /home/steve/git/dart --rip-o-matic $DEVNAME" | at now
+echo "/usr/bin/doas -u steve /usr/bin/php /home/steve/git/dart/dart.php --rip-o-matic -z $1" | at now
