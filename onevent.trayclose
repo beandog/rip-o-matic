@@ -1,2 +1,2 @@
-#!/bin/bash
+#!/usr/bin/env bash
 echo "/usr/bin/doas -u steve /usr/bin/php /home/steve/git/dart/dart.php --rip-o-matic -z $1" | at now

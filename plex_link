@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 if [[ -z "$1" ]]; then echo "Need a filename"; exit 1; fi
 for video in $*; do
 

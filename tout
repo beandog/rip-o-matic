@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 filename=$1
 if [[ ${0: -2} == "sh" ]] || [[ ${1: -2} == "sh" ]]; then
 	confcat "$filename" >> time.out

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 rip_logfile="/home/steve/Media/Rip-o-Matic/Wishy-Washy-Soapy-Spinny.log"
 dvd_logfile="/home/steve/Media/Rip-o-Matic/Logs/$(/usr/bin/date +%Y.%m.%d-%l.%M-%p-%N).log"
 /usr/bin/doas -u steve /usr/local/bin/dart --rip-o-matic $1 2>&1 | /usr/bin/doas -u steve /usr/bin/tee -a $rip_logfile | /usr/bin/doas -u steve /usr/bin/tee -a $dvd_logfile

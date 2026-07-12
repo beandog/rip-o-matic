@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 /usr/bin/findmnt /media/bd || exit 1
 /usr/bin/findmnt /media/sd || exit 1
 /usr/bin/findmnt /media/tv || exit 1

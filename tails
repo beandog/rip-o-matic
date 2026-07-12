@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/usr/bin/env bash
 rsync -uvrltD --progress "$@" dlna:/opt/jfin/libraries/tails
 ssh dlna chown -R jellyfin: /opt/jfin/libraries/tails
