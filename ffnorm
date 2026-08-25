@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+for video in "$@"; do
+	count=$(echo "$video" | egrep -c "mp4$")
+	if [[ $count -ne 1 ]]; then continue; fi
+	video_basename=$(basename "$video" .mp4)
+	audio_prefix="01_"
+	video_prefix="99_"
+	audio_suffix=".wav"
+	video_suffix=".mp4"
+	new_audio="${audio_prefix}${video_basename}${audio_suffix}"
+	new_video="${video_prefix}${video_basename}${video_suffix}"
+	# if [[ -e "$audio" ]]; then continue; fi
+	# echo "[ $video -> $new_audio ]"
+	# ffmpeg -hide_banner -v warning -stats -i "$video" -vn -af loudnorm=I=-16:TP=-1.5:LRA=11 -ar 48000 -n "${new_audio}"
+
+	echo "[ $video -> $new_video ]"
+	ffmpeg -hide_banner -v warning -stats -i "$video" -vcodec copy -af loudnorm=I=-16:TP=-1.5:LRA=11 -ar 48000 -n "${new_video}"
+done
